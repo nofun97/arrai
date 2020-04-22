@@ -52,7 +52,9 @@ expr   -> C* amp="&"* @ C* arrow=(
                   arg=( range | expr ):",",
               ")")
           )* C*
-        > C* "{" C* rel=(names tuple=("(" v=@:",", ")"):",",?) "}" C*
+		> C* "[" C* iota_array=range "]" C*
+		| C* "{" C* iota_set=range "}" C*
+		| C* "{" C* rel=(names tuple=("(" v=@:",", ")"):",",?) "}" C*
         | C* "{" C* set=(elt=@:",",?) "}" C*
         | C* "{" C* dict=((key=@ ":" value=@):",",?) "}" C*
         | C* cond=("cond" "(" (key=@ ":" value=@):",",? ("*" ":" f=expr)? ")") C*
