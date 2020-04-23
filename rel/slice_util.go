@@ -155,10 +155,7 @@ func getIndexes(start, end, step int, inclusive bool) []int {
 		}
 	}
 
-	length := int(math.Abs(float64(start - end)))
-	if step != 1 && step != -1 {
-		length = int(math.Ceil(float64(length) / math.Abs(float64(step))))
-	}
+	length := rangeLength(start, end, step)
 	indexes := make([]int, 0, length)
 	for i := 0; i < length; i++ {
 		indexes = append(indexes, start+step*i)
@@ -170,4 +167,12 @@ func getIndexes(start, end, step int, inclusive bool) []int {
 // isValidRange checks whether start, end, and step are valid values.
 func isValidRange(start, end, step int) bool {
 	return step != 0 && ((start > end && step < 0) || (start < end && step > 0))
+}
+
+func rangeLength(start, end, step int) int {
+	length := int(math.Abs(float64(start - end)))
+	if step != 1 && step != -1 {
+		length = int(math.Ceil(float64(length) / math.Abs(float64(step))))
+	}
+	return length
 }
