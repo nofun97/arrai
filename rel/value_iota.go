@@ -7,17 +7,17 @@ import (
 )
 
 type Iota struct {
-	start, end, step int
-	inclusive        bool
-	resultWrapper    func(...Value) Set
-	strFormat        string
+	start, end, step, length int
+	inclusive                bool
+	resultWrapper            func(...Value) Set
+	strFormat                string
 }
 
 func NewIota(
 	rangeValues *rangeDataValues,
 	resultWrapper func(...Value) Set,
 	stringFormat string,
-) Expr {
+) Set {
 	step := int(rangeValues.step.(Number))
 
 	start, end := int(math.Inf(1)), int(math.Inf(-1))
@@ -41,26 +41,54 @@ func NewIota(
 		}
 	}
 
-	return Iota{start, end, step, rangeValues.isInclusive(), resultWrapper, stringFormat}
+	if !isValidRange(start, end, step) {
+		return None
+	}
+
+	length := rangeLength(start, end, step)
+	if isInf(end) && rangeValues.isInclusive() {
+		length++
+	}
+	return Iota{start, end, step, length, rangeValues.isInclusive(), resultWrapper, stringFormat}
 }
 
 func (it Iota) Count() int {
-	return rangeLength(it.start, it.end, it.step)
+	return it.length
 }
 
 func (it Iota) Has(v Value) bool {
-	//TODO:
-	return true
+	if _, isNumber := v.(Number); !isNumber {
+		return false
+	}
+	index := int(math.Abs(float64((int(v.(Number)) - it.start) / it.step)))
+	return index < it.length
 }
 
 func (it Iota) Enumerator() ValueEnumerator {
-	//TODO:
+	if e, enumeratable := it.ArrayEnumerator(); enumeratable {
+		return e
+	}
 	return nil
 }
 
 func (it Iota) With(v Value) Set {
-	// TODO:
-	return it
+	//TODO: how to handle lazy unbounded set
+	if it.Has(v) {
+		return it
+	}
+	if _, isNumber := v.(Number); !isNumber || it.inRange(v) {
+		return newSetFromSet(it).With(v)
+	}
+	num := int(v.(Number))
+	if it.step > 0 {
+		var rv *rangeDataValues
+		if it.getMaxNum() + it.step == num {
+			rv = &rangeDataValues{
+				Number(it.start), Number(it.)
+			}
+		}
+	}
+	return newSetFromSet(it).With(v)
 }
 
 func (it Iota) Without(v Value) Set {
@@ -79,15 +107,16 @@ func (it Iota) Where(f func(Value) bool) Set {
 }
 
 func (it Iota) Call(arg Value) Value {
-	i := int(arg.(Number))
-	if i >= it.Count() || i < 0 {
+	return getValueAtIndex(int(arg.(Number)), it.start, it.step, it.Count())
+}
+
+func getValueAtIndex(index, start, step, maxLen int) Value {
+	if index >= maxLen || index < 0 {
 		// TODO:
 		return nil
 	}
-	return Number(it.start + it.step*i)
+	return Number(start + step*index)
 }
-
-func getIndex(start, step, maxLen int)
 
 func (it Iota) CallSlice(start, end Value, step int, inclusive bool) Set {
 	//TODO:
@@ -95,12 +124,14 @@ func (it Iota) CallSlice(start, end Value, step int, inclusive bool) Set {
 }
 
 func (it Iota) ArrayEnumerator() (OffsetValueEnumerator, bool) {
-	//TODO:
-	return nil, false
+	if it.length == 0 {
+		return nil, false
+	}
+	return &IotaArrayEnumerator{0, it.start, it.step, it.length}, true
 }
 
 type IotaArrayEnumerator struct {
-	index, length int
+	index, minVal, increment, length int
 }
 
 func (ia *IotaArrayEnumerator) MoveNext() bool {
@@ -109,7 +140,12 @@ func (ia *IotaArrayEnumerator) MoveNext() bool {
 }
 
 func (ia *IotaArrayEnumerator) Current() Value {
-	return
+	return getValueAtIndex(ia.index, ia.minVal, ia.increment, ia.length)
+}
+
+func (ia *IotaArrayEnumerator) Offset() int {
+	//TODO:
+	return 0
 }
 
 func (it Iota) Eval(local Scope) (Value, error) {
@@ -168,27 +204,27 @@ func (it Iota) IsTrue() bool {
 	return isValidRange(it.start, it.end, it.step)
 }
 
-func generateSequence(start, end Value, step int, inclusive bool) []Value {
-	startVal, endVal := math.Inf(1), math.Inf(-1)
-	if step < 0 {
-		startVal, endVal = endVal, startVal
-	}
+// func generateSequence(start, end Value, step int, inclusive bool) []Value {
+// 	startVal, endVal := math.Inf(1), math.Inf(-1)
+// 	if step < 0 {
+// 		startVal, endVal = endVal, startVal
+// 	}
 
-	if start != nil {
-		startVal = float64(start.(Number))
-	}
+// 	if start != nil {
+// 		startVal = float64(start.(Number))
+// 	}
 
-	if end != nil {
-		endVal = float64(end.(Number))
-	}
+// 	if end != nil {
+// 		endVal = float64(end.(Number))
+// 	}
 
-	vals := getIndexes(int(startVal), int(endVal), step, inclusive)
-	wrappedVals := make([]Value, 0, len(vals))
-	for _, v := range vals {
-		wrappedVals = append(wrappedVals, Number(v))
-	}
-	return wrappedVals
-}
+// 	vals := getIndexes(int(startVal), int(endVal), step, inclusive)
+// 	wrappedVals := make([]Value, 0, len(vals))
+// 	for _, v := range vals {
+// 		wrappedVals = append(wrappedVals, Number(v))
+// 	}
+// 	return wrappedVals
+// }
 
 func (it Iota) String() string {
 	var start, end Expr
@@ -203,6 +239,22 @@ func (it Iota) String() string {
 		step = NewNumber(float64(it.step))
 	}
 	return fmt.Sprintf(it.strFormat, NewRangeData(start, end, step, it.inclusive).string())
+}
+
+func (it Iota) getMaxNum() int {
+	return int(getValueAtIndex(it.Count()-1, it.start, it.step, it.Count()).(Number))
+}
+
+func (it Iota) inRange(n Value) bool {
+	if !isValidRange(it.start, it.end, it.step) {
+		return false
+	}
+	num := int(n.(Number))
+	maxNum := it.getMaxNum()
+	if it.step > 0 {
+		return it.start <= num && num < maxNum
+	}
+	return it.start >= num && num < maxNum
 }
 
 func isInf(x int) bool {

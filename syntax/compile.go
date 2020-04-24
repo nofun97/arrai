@@ -94,8 +94,8 @@ func (pc ParseContext) CompileExpr(b ast.Branch) rel.Expr {
 		return pc.compileCallGet(b)
 	case "rel":
 		return pc.compileRelation(c)
-	case "iota_array", "iota_set":
-		return pc.compileIota(name, b)
+	// case "iota_array", "iota_set":
+	// 	return pc.compileIota(name, b)
 	case "set":
 		return pc.compileSet(c)
 	case "dict":
@@ -322,21 +322,21 @@ func (pc ParseContext) compileRelation(c ast.Children) rel.Expr {
 	return result
 }
 
-func (pc ParseContext) compileIota(iotaType string, b ast.Branch) rel.Expr {
-	var resultWrapper func(...rel.Value) rel.Value
-	var strFormat string
-	switch iotaType {
-	case "iota_set":
-		resultWrapper = func(vals ...rel.Value) rel.Value { return rel.NewSet(vals...) }
-		strFormat = "{%s}"
-	case "iota_array":
-		resultWrapper = func(vals ...rel.Value) rel.Value { return rel.NewArray(vals...) }
-		strFormat = "{%s}"
-	default:
-		panic("parsing iota of unknown type")
-	}
-	return rel.NewIotaExpr(pc.compileRangeData(b.One(iotaType).One("range").(ast.Branch)), resultWrapper, strFormat)
-}
+// func (pc ParseContext) compileIota(iotaType string, b ast.Branch) rel.Expr {
+// 	var resultWrapper func(...rel.Value) rel.Value
+// 	var strFormat string
+// 	switch iotaType {
+// 	case "iota_set":
+// 		resultWrapper = func(vals ...rel.Value) rel.Value { return rel.NewSet(vals...) }
+// 		strFormat = "{%s}"
+// 	case "iota_array":
+// 		resultWrapper = func(vals ...rel.Value) rel.Value { return rel.NewArray(vals...) }
+// 		strFormat = "{%s}"
+// 	default:
+// 		panic("parsing iota of unknown type")
+// 	}
+// 	return rel.NewIotaExpr(pc.compileRangeData(b.One(iotaType).One("range").(ast.Branch)), resultWrapper, strFormat)
+// }
 
 func (pc ParseContext) compileSet(c ast.Children) rel.Expr {
 	if elts := c.(ast.One).Node.(ast.Branch)["elt"]; elts != nil {
