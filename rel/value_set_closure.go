@@ -148,6 +148,11 @@ func (c Closure) CallAll(arg Value) (Set, error) {
 	return NewSet(val), nil
 }
 
+func (c Closure) CallSlice(sd *SliceData) (Set, error) {
+	//TODO: CallSlice
+	return nil, nil
+}
+
 func (c Closure) ArrayEnumerator() (OffsetValueEnumerator, bool) {
 	panic("unimplemented")
 }

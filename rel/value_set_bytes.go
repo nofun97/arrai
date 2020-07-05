@@ -236,6 +236,11 @@ func (b Bytes) CallAll(arg Value) (Set, error) {
 	return NewSet(NewNumber(float64(string(b.b)[i]))), nil
 }
 
+func (b Bytes) CallSlice(sd *SliceData) (Set, error) {
+	//TODO: CallSlice
+	return nil, nil
+}
+
 func (b Bytes) index(pos int) int {
 	pos -= b.offset
 	if 0 <= pos && pos <= len(b.b) {

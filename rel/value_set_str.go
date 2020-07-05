@@ -229,6 +229,11 @@ func (s String) CallAll(arg Value) (Set, error) {
 	return NewSet(NewNumber(float64(string(s.s)[i]))), nil
 }
 
+func (s String) CallSlice(sd *SliceData) (Set, error) {
+	//TODO: CallSlice
+	return nil, nil
+}
+
 func (s String) index(pos int) int {
 	pos -= s.offset
 	if 0 <= pos && pos <= len(s.s) {

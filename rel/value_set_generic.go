@@ -307,6 +307,11 @@ func (s GenericSet) CallAll(arg Value) (Set, error) {
 	return set, nil
 }
 
+func (s GenericSet) CallSlice(sd *SliceData) (Set, error) {
+	//TODO: CallSlice
+	return nil, nil
+}
+
 // Enumerator returns an enumerator over the Values in the genericSet.
 func (s GenericSet) Enumerator() ValueEnumerator {
 	return &genericSetEnumerator{s.set.Range()}

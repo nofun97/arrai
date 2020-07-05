@@ -67,16 +67,14 @@ sexpr  -> "${"
           close=/{\}\s*};
 tail   -> get
           | call=("("
-                arg=(
-                    expr (":" end=expr? (":" step=expr)?)?
-                    |     ":" end=expr  (":" step=expr)?
-                ):SEQ_COMMENT,
+                arg=( slice | expr ):SEQ_COMMENT,
             ")");
-pattern -> extra 
+slice  -> start=expr? ":" end=expr? (":" step=expr)?;
+pattern -> extra
         | %!patternterms(pattern|expr)
         | IDENT
-        | NUM 
-        | C* "(" exprpattern=expr:SEQ_COMMENT,? ")" C* 
+        | NUM
+        | C* "(" exprpattern=expr:SEQ_COMMENT,? ")" C*
         | C* exprpattern=STR C*;
 extra -> ("..." ident=IDENT?);
 fallback -> ("?"? ":" fall=expr);

@@ -119,6 +119,7 @@ type Set interface {
 	Map(func(Value) Value) Set
 	Where(func(Value) (bool, error)) (Set, error)
 	CallAll(Value) (Set, error)
+	CallSlice(*SliceData) (Set, error)
 
 	ArrayEnumerator() (OffsetValueEnumerator, bool)
 }

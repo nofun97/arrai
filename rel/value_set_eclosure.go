@@ -122,6 +122,11 @@ func (c ExprClosure) CallAll(arg Value) (Set, error) {
 	panic("unimplemented")
 }
 
+func (c ExprClosure) CallSlice(sd *SliceData) (Set, error) {
+	//TODO: CallSlice
+	return nil, nil
+}
+
 func (ExprClosure) ArrayEnumerator() (OffsetValueEnumerator, bool) {
 	panic("unimplemented")
 }

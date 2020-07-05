@@ -285,6 +285,11 @@ func (d Dict) CallAll(arg Value) (Set, error) {
 	return None, nil
 }
 
+func (d Dict) CallSlice(sd *SliceData) (Set, error) {
+	//TODO: CallSlice
+	return nil, nil
+}
+
 func (d Dict) ArrayEnumerator() (OffsetValueEnumerator, bool) {
 	return nil, false
 }

@@ -380,6 +380,13 @@ func (a Array) CallAll(arg Value) (Set, error) {
 	return None, nil
 }
 
+func (a Array) CallSlice(sd *SliceData) (Set, error) {
+	//TODO: CallSlice
+	initArraySlice(sd, a.offset, a.count)
+	
+	return nil, nil
+}
+
 // Enumerator returns an enumerator over the Values in the Array.
 func (a Array) Enumerator() ValueEnumerator {
 	return &arrayValueEnumerator{a: a, i: -1}

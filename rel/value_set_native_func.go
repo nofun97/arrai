@@ -130,6 +130,11 @@ func (f *NativeFunction) CallAll(arg Value) (Set, error) {
 	return NewSet(v), nil
 }
 
+func (f *NativeFunction) CallSlice(sd *SliceData) (Set, error) {
+	//TODO: CallSlice
+	return nil, nil
+}
+
 func (*NativeFunction) ArrayEnumerator() (OffsetValueEnumerator, bool) {
 	panic("unimplemented")
 }

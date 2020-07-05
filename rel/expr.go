@@ -29,7 +29,7 @@ func NewContextErr(err error, source parser.Scanner, scope Scope) ContextErr {
 func (c ContextErr) Error() string {
 	if cerr, is := c.err.(ContextErr); is {
 		errString := cerr.Error()
-		if c.source.Contains(cerr.source) {
+	if c.source.Contains(cerr.source) {
 			return errString
 		}
 		return fmt.Sprintf("%s\n%s", errString, c.source.Context(parser.DefaultLimit))

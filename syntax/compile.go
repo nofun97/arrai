@@ -537,6 +537,13 @@ func (pc ParseContext) compileCallGet(b ast.Branch) rel.Expr {
 	return result
 }
 
+func (pc ParseContext) compileSliceData(n ast.Node) rel.Expr {
+	n.One("start")
+	n.One("end")
+	n.One("step")
+	return nil
+}
+
 func (pc ParseContext) compileTail(base rel.Expr, tail ast.Node) rel.Expr {
 	if tail != nil {
 		if call := tail.One("call"); call != nil {

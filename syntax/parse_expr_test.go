@@ -119,7 +119,7 @@ func TestParseNestExpr(t *testing.T) {
 		`{|a,b| (1,1), (1,2), (2,3)} nest |b|b`,
 	)
 	AssertCodesEvalToSameValue(t,
-		`{|a,bc| (1, {|b,c| (1, 1), (2, 1)}), (2, {|b,c| (3, 4)})}`,
+		`{|a,bc| (1, {|b,c| (1, 1), (2, 1)}), (2, {|b,c| (3, 4)}e)}`,
 		`{|a,b,c| (1,1,1), (2, 3, 4), (1,2,1)} nest |b,c|bc`,
 	)
 	AssertCodesEvalToSameValue(t,
